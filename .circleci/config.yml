@@ -19,6 +19,13 @@ jobs:
           name: Install Dependencies
           command: npm ci
 
+      - run:
+          name: Verify Chrome
+          command: |
+            echo "CHROME_BIN=$CHROME_BIN"
+            ls -l $CHROME_BIN
+            $CHROME_BIN --version
+
       - save_cache:
           paths:
             - ~/.npm
@@ -58,4 +65,3 @@ workflows:
               only:
                 - main
                 - master
-                
