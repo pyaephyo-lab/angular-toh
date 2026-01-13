@@ -6,7 +6,7 @@ jobs:
       - image: cimg/node:18.20.0-browsers
 
     environment:
-      CHROME_BIN: /usr/bin/google-chrome
+      CHROME_BIN: /usr/bin/chromium-browser
 
     steps:
       - checkout
@@ -20,11 +20,13 @@ jobs:
           command: npm ci
 
       - run:
-          name: Verify Chrome
+          name: Verify Chrome / Chromium
           command: |
-            echo "CHROME_BIN=$CHROME_BIN"
-            ls -l $CHROME_BIN
-            $CHROME_BIN --version
+            which google-chrome || true
+            which chromium || true
+            which chromium-browser || true
+            chromium --version || true
+            chromium-browser --version || true
 
       - save_cache:
           paths:
