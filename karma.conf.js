@@ -1,7 +1,15 @@
 // Karma configuration file
 // https://karma-runner.github.io/1.0/config/configuration-file.html
 
-process.env.CHROME_BIN =
+if (!process.env.CHROME_BIN) {
+  if (require('fs').existsSync('/usr/bin/chromium')) {
+    process.env.CHROME_BIN = '/usr/bin/chromium';
+  } else if (require('fs').existsSync('/usr/bin/chromium-browser')) {
+    process.env.CHROME_BIN = '/usr/bin/chromium-browser';
+  } else if (require('fs').existsSync('/usr/bin/google-chrome')) {
+    process.env.CHROME_BIN = '/usr/bin/google-chrome';
+  }
+}
   process.env.CHROME_BIN ||
   '/usr/bin/chromium' ||
   '/usr/bin/chromium-browser';
