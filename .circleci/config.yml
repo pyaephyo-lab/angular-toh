@@ -1,0 +1,57 @@
+version: 2.1
+
+jobs:
+  build-prod:
+    docker:
+      - image: cimg/node:18.20.0-browsers
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Install Dependencies
+          command: npm install
+
+      - save_cache:
+          paths:
+            - ~/.npm
+          key: npm-cache-{{ checksum "package-lock.json" }}
+
+      - run:
+          name: Build Production Assets
+          command: npm run build:prod
+
+      - run:
+          name: Run Production Tests
+          command: npm run test:headless
+
+      - store_test_results:
+          path: test-results
+
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+            unzip awscliv2.zip
+            sudo ./aws/install
+
+      - run:
+          name: Deploy to S3
+          command: |
+            DIST_OUTPUT_DIR=$(find dist -maxdepth 1 -type d | awk 'NR==2')
+            aws s3 sync ${DIST_OUTPUT_DIR}/browser/ s3://$S3_BUCKET_NAME --delete
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build-prod:
+          filters:
+            branches:
+              only:
+                - main
+                - master
