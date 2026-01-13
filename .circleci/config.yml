@@ -5,6 +5,9 @@ jobs:
     docker:
       - image: cimg/node:18.20.0-browsers
 
+    environment:
+      CHROME_BIN: /usr/bin/google-chrome
+
     steps:
       - checkout
 
@@ -26,12 +29,7 @@ jobs:
           command: npm run build:prod
 
       - run:
-          name: Set Chrome Binary
-          command: |
-            echo 'export CHROME_BIN=/usr/bin/google-chrome' >> $BASH_ENV
-
-      - run:
-          name: Run Production Tests
+          name: Run Headless Tests
           command: npm run test:headless
 
       - store_test_results:
@@ -60,3 +58,4 @@ workflows:
               only:
                 - main
                 - master
+                
